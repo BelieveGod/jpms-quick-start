@@ -1,0 +1,28 @@
+# 编译文件
+javac -d mods --module-source-path src $(find src -name "*.java")
+
+
+# 打包文件
+jar --create --file=mlib/org.astro-1.0.jar \
+        --module-version=1.0 -C mods/org.astro .
+ 
+
+jar --create --file=mlib/com.socket-1.0.jar \
+        --module-version=1.0 -C mods/com.socket .
+        
+jar --create --file=mlib/org.fastsocket-1.0.jar \
+        --module-version=1.0 -C mods/org.fastsocket .
+
+jar --create --file=mlib/com.greetings.jar \
+        --main-class=com.greetings.Main -C mods/com.greetings .
+
+
+## 链接Runtime
+jlink -p mlib --strip-debug --compress 1 --no-header-files --no-man-pages --output miniJre --add-modules com.greetings
+jlink -p mlib --strip-debug --compress 1 --no-header-files --no-man-pages --output miniJre2 --add-modules com.greetings,org.fastsocket
+jlink -p mlib --strip-debug --compress 1 --no-header-files --no-man-pages --output miniJre3 --add-modules org.fastsocket,com.socket,org.astro
+
+## 运行
+.\miniJre\bin\java.exe -jar .\mlib\com.greetings.jar
+.\miniJre2\bin\java.exe -jar .\mlib\com.greetings.jar
+.\miniJre3\bin\java.exe -jar .\mlib\com.greetings.jar
